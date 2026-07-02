@@ -72,9 +72,7 @@ const PORT = 3000;
 
 app.use(express.json());
 
-async function startServer() {
-
-  // API Route: Inspect URL details (Headers, Meta info, Speed)
+// API Route: Inspect URL details (Headers, Meta info, Speed)
   app.get("/api/inspect", async (req, res) => {
     const rawUrl = req.query.url as string;
     if (!rawUrl) {
@@ -452,8 +450,9 @@ async function startServer() {
     }
   });
 
-  // Vite middleware integration for React frontend
-  if (!process.env.VERCEL) {
+// Vite middleware integration for React frontend
+if (!process.env.VERCEL) {
+  const startLocalServer = async () => {
     if (process.env.NODE_ENV !== "production") {
       const { createServer: createViteServer } = await import("vite");
       const vite = await createViteServer({
@@ -472,9 +471,9 @@ async function startServer() {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
-  }
-}
+  };
 
-startServer();
+  startLocalServer();
+}
 
 export default app;
