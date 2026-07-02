@@ -25,7 +25,12 @@ import {
   Sparkles,
   SearchCode,
   Compass,
-  FileText
+  FileText,
+  Home,
+  Cpu,
+  Zap,
+  Fingerprint,
+  Activity
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { 
@@ -82,8 +87,8 @@ const PRESETS = [
 
 export default function App() {
   // Navigation & Address Bar state
-  const [inputUrl, setInputUrl] = useState("https://en.wikipedia.org/wiki/Main_Page");
-  const [currentUrl, setCurrentUrl] = useState("https://en.wikipedia.org/wiki/Main_Page");
+  const [inputUrl, setInputUrl] = useState("");
+  const [currentUrl, setCurrentUrl] = useState("home");
   const [iframeKey, setIframeKey] = useState(0);
   
   // Custom headers & User-Agent state
@@ -190,7 +195,13 @@ export default function App() {
 
   // Navigate Trigger
   const handleNavigate = (urlToLoad?: string) => {
-    const finalUrl = processInputToUrl(urlToLoad || inputUrl);
+    const target = urlToLoad !== undefined ? urlToLoad : inputUrl;
+    if (target === "home") {
+      setCurrentUrl("home");
+      setInputUrl("");
+      return;
+    }
+    const finalUrl = processInputToUrl(target);
     setCurrentUrl(finalUrl);
     setInputUrl(finalUrl);
     setIframeKey(prev => prev + 1); // Force iframe refresh
@@ -237,6 +248,10 @@ export default function App() {
 
   // Toggle Bookmark
   const toggleBookmark = () => {
+    if (currentUrl === "home") {
+      showTemporaryStatus("Cannot bookmark the Home screen!");
+      return;
+    }
     const isBookmarked = bookmarks.some(b => b.url === currentUrl);
     if (isBookmarked) {
       const updated = bookmarks.filter(b => b.url !== currentUrl);
@@ -269,6 +284,12 @@ export default function App() {
   // Fetch Inspector details
   const fetchInspectDetails = async (urlOverride?: string) => {
     const url = urlOverride || currentUrl;
+    if (url === "home") {
+      setInspectData(null);
+      setInspectLoading(false);
+      setInspectError(null);
+      return;
+    }
     setInspectLoading(true);
     setInspectError(null);
     try {
@@ -295,6 +316,12 @@ export default function App() {
   // Fetch Reader Mode contents
   const fetchReaderMode = async (urlOverride?: string) => {
     const url = urlOverride || currentUrl;
+    if (url === "home") {
+      setReaderData(null);
+      setReaderLoading(false);
+      setReaderError(null);
+      return;
+    }
     setReaderLoading(true);
     setReaderError(null);
     try {
@@ -316,6 +343,12 @@ export default function App() {
   // Fetch raw HTML source code
   const fetchRawSource = async (urlOverride?: string) => {
     const url = urlOverride || currentUrl;
+    if (url === "home") {
+      setSourceHtml("");
+      setSourceLoading(false);
+      setSourceError(null);
+      return;
+    }
     setSourceLoading(true);
     setSourceError(null);
     try {
@@ -335,6 +368,12 @@ export default function App() {
 
   // Copy current Proxied Address
   const copyProxiedUrl = () => {
+    if (currentUrl === "home") {
+      navigator.clipboard.writeText(window.location.origin);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      return;
+    }
     const ua = selectedUa === "custom" ? customUaText : selectedUa;
     const fullProxied = `${window.location.origin}/api/proxy?url=${encodeURIComponent(obfuscateUrl(currentUrl))}&ua=${encodeURIComponent(ua)}`;
     navigator.clipboard.writeText(fullProxied);
@@ -454,12 +493,27 @@ export default function App() {
         {/* Header Controls Bar */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
+            onClick={() => handleNavigate("home")}
+            title="Go to Home Portal"
+            className={`p-2 rounded-lg transition border ${
+              currentUrl === "home"
+                ? "bg-indigo-950/50 border-indigo-500 text-indigo-400 font-medium"
+                : "bg-slate-800 border-slate-700/80 text-slate-300 hover:bg-slate-700 hover:text-white"
+            }`}
+          >
+            <Home className="w-3.5 h-3.5" />
+          </button>
+          <button
             onClick={() => {
-              setInputUrl(currentUrl);
-              handleNavigate(currentUrl);
+              if (currentUrl === "home") {
+                handleNavigate("https://duckduckgo.com");
+              } else {
+                setInputUrl(currentUrl);
+                handleNavigate(currentUrl);
+              }
             }}
             title="Reload proxy content"
-            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition border border-slate-700/80"
+            className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition border border-slate-700/80 hover:text-white"
           >
             <RotateCw className="w-3.5 h-3.5" />
           </button>
@@ -790,15 +844,157 @@ export default function App() {
             {/* Browser Interactive View Mode */}
             {activeTab === "browser" && (
               <div className="w-full h-full flex flex-col bg-slate-950">
-                <div className="flex-1 relative">
-                  <iframe
-                    key={iframeKey}
-                    src={getIframeSrc()}
-                    className="w-full h-full bg-white border-none shadow-inner"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                    title="Proxied Content Frame"
-                  />
-                </div>
+                {currentUrl === "home" ? (
+                  <div className="flex-1 overflow-y-auto p-6 md:p-12 relative flex flex-col items-center justify-start bg-[#0b0f19] text-slate-200">
+                    {/* Glowing Grid Background or subtle pattern */}
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b12_1px,transparent_1px),linear-gradient(to_bottom,#1e293b12_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+                    
+                    <div className="max-w-3xl w-full mx-auto my-auto flex flex-col items-center text-center space-y-8 relative z-10 py-6">
+                      
+                      {/* Logo and Brand Title */}
+                      <motion.div 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="w-20 h-20 bg-indigo-600/10 border-2 border-indigo-500/30 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.25)] mb-4">
+                          <Shield className="w-10 h-10 text-indigo-400 animate-pulse" />
+                        </div>
+                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
+                          ShieldProxy <span className="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded font-mono">v2.0</span>
+                        </h2>
+                        <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-md">
+                          A high-speed, secure proxy portal designed to bypass censorship filters, anonymize connection data, and preview any page cleanly.
+                        </p>
+                      </motion.div>
+
+                      {/* Giant Central Search Input */}
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.1 }}
+                        className="w-full max-w-2xl relative group"
+                      >
+                        <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur-md opacity-25 group-hover:opacity-45 focus-within:opacity-100 transition duration-300"></div>
+                        <div className="relative flex items-center bg-slate-900 border border-slate-700 hover:border-slate-600 rounded-2xl p-1.5 shadow-2xl">
+                          <div className="pl-4 text-slate-400 flex items-center">
+                            <Globe className="w-4 h-4 text-indigo-400" />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Type a web address or search query to load..."
+                            value={inputUrl}
+                            onChange={(e) => setInputUrl(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") handleNavigate();
+                            }}
+                            className="w-full bg-transparent text-sm text-white pl-3.5 pr-24 py-3 focus:outline-none font-mono placeholder-slate-500"
+                          />
+                          <button
+                            onClick={() => handleNavigate()}
+                            className="absolute right-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 flex items-center gap-1.5"
+                          >
+                            <Search className="w-3.5 h-3.5" />
+                            <span>Navigate</span>
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-slate-500 text-left mt-2 pl-4 font-mono">
+                          ⚡ Enter a query to search <span className="text-indigo-400">DuckDuckGo (Strict Privacy)</span> or write any URL (e.g. <span className="text-indigo-400">github.com</span>)
+                        </p>
+                      </motion.div>
+
+                      {/* Beautiful Presets Grid */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="w-full"
+                      >
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-4">
+                          <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <Compass className="w-3.5 h-3.5 text-indigo-400" /> Secure Quick-Launch Presets
+                          </span>
+                          <span className="text-[10px] text-slate-500 font-medium">Bypasses strict network inspection</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                          {[
+                            { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: "🦆", desc: "Private Search" },
+                            { name: "Wikipedia", url: "https://en.wikipedia.org/wiki/Main_Page", icon: "🌐", desc: "Encyclopedia" },
+                            { name: "Hacker News", url: "https://news.ycombinator.com", icon: "🔥", desc: "Tech News" },
+                            { name: "GitHub", url: "https://github.com", icon: "🐙", desc: "Code Repository" },
+                            { name: "Reddit", url: "https://old.reddit.com", icon: "👽", desc: "Reddit Classic" },
+                            { name: "BBC News", url: "https://www.bbc.com", icon: "📰", desc: "World News" }
+                          ].map((preset) => (
+                            <button
+                              key={preset.name}
+                              onClick={() => {
+                                setInputUrl(preset.url);
+                                handleNavigate(preset.url);
+                              }}
+                              className="group flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 rounded-xl transition duration-200 shadow-sm text-center relative overflow-hidden"
+                            >
+                              <div className="absolute top-0 left-0 w-full h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+                              <span className="text-xl mb-1.5 group-hover:scale-110 transition duration-200">{preset.icon}</span>
+                              <span className="text-xs font-bold text-slate-200 group-hover:text-indigo-400 transition leading-tight">{preset.name}</span>
+                              <span className="text-[9px] text-slate-500 mt-0.5 leading-none">{preset.desc}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      {/* Privacy Safeguards Info Cards */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
+                      >
+                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                          <div className="flex items-center gap-2 text-indigo-400">
+                            <Fingerprint className="w-4.5 h-4.5" />
+                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">URL Obfuscation</h4>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            Target URL paths and query parameters are dynamically encrypted before traversing local firewall inspection nodes.
+                          </p>
+                        </div>
+
+                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                          <div className="flex items-center gap-2 text-indigo-400">
+                            <Cpu className="w-4.5 h-4.5" />
+                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Header Spoofing</h4>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            Inject custom headers or randomize your client User-Agent strings seamlessly to bypass device or regional restrictions.
+                          </p>
+                        </div>
+
+                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                          <div className="flex items-center gap-2 text-indigo-400">
+                            <Activity className="w-4.5 h-4.5" />
+                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">CORS Resolution</h4>
+                          </div>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">
+                            Bypasses strict browser Cross-Origin Resource Sharing (CORS) limits using our high-speed Cloud Run server engine.
+                          </p>
+                        </div>
+                      </motion.div>
+
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 relative">
+                    <iframe
+                      key={iframeKey}
+                      src={getIframeSrc()}
+                      className="w-full h-full bg-white border-none shadow-inner"
+                      sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                      title="Proxied Content Frame"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -917,7 +1113,11 @@ export default function App() {
 
                     </div>
                   ) : (
-                    <div className="text-center py-20 text-slate-500 italic">No inspecting data yet. Type a URL above and visit!</div>
+                    <div className="text-center py-16 px-4 bg-slate-900/40 border border-slate-800/80 rounded-xl max-w-md mx-auto my-auto">
+                      <Terminal className="w-8 h-8 text-indigo-500/80 mx-auto mb-3" />
+                      <h3 className="font-semibold text-slate-300 text-sm mb-1">HTTP Inspector Standby</h3>
+                      <p className="text-xs text-slate-400 max-w-xs mx-auto">Enter a destination website in the address bar above and visit to analyze raw HTTP response headers, metadata, and connection speed.</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -1022,7 +1222,11 @@ export default function App() {
 
                       </article>
                     ) : (
-                      <div className="text-center py-20 text-slate-500 italic">No article content. Try a blog, documentation, or news article URL!</div>
+                      <div className="text-center py-16 px-4 bg-slate-900/20 border border-slate-800/50 rounded-xl max-w-md mx-auto my-auto">
+                        <BookOpen className="w-8 h-8 text-indigo-500/80 mx-auto mb-3" />
+                        <h3 className="font-semibold text-slate-300 text-sm mb-1">Reader Mode Standby</h3>
+                        <p className="text-xs text-slate-400 max-w-xs mx-auto">Paste any article, news report, or blog post URL in the browser address bar to extract content into a beautifully readable format.</p>
+                      </div>
                     )}
 
                   </div>
@@ -1091,7 +1295,11 @@ export default function App() {
                       />
                     </pre>
                   ) : (
-                    <div className="text-center py-20 text-slate-600 italic">No source loaded. Type a URL above and launch browser.</div>
+                    <div className="text-center py-16 px-4 bg-slate-900/20 border border-slate-800/50 rounded-xl max-w-md mx-auto my-auto">
+                      <Code className="w-8 h-8 text-indigo-500/80 mx-auto mb-3" />
+                      <h3 className="font-semibold text-slate-300 text-sm mb-1">Source Code Viewer Standby</h3>
+                      <p className="text-xs text-slate-400 max-w-xs mx-auto">Navigate to any web address in the address bar above to load, color-highlight, and search the raw HTML markup code fetched by our secure gateway node.</p>
+                    </div>
                   )}
                 </div>
 
