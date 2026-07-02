@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import * as cheerio from "cheerio";
 
 // Simple custom base64-based character shift obfuscation to completely hide raw URL queries from target firewalls and deep packet inspectors
@@ -456,6 +455,7 @@ async function startServer() {
   // Vite middleware integration for React frontend
   if (!process.env.VERCEL) {
     if (process.env.NODE_ENV !== "production") {
+      const { createServer: createViteServer } = await import("vite");
       const vite = await createViteServer({
         server: { middlewareMode: true },
         appType: "spa",
