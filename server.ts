@@ -71,6 +71,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Route: Inspect URL details (Headers, Meta info, Speed)
   app.get("/api/inspect", async (req, res) => {
@@ -91,9 +92,17 @@ app.use(express.json());
       const startTime = Date.now();
       const ua = req.query.ua as string || "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
       
-      const response = await fetch(targetUrl, {
-        headers: { "User-Agent": ua },
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8500);
+      let response;
+      try {
+        response = await fetch(targetUrl, {
+          headers: { "User-Agent": ua },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
       const loadTime = Date.now() - startTime;
 
       const contentType = response.headers.get("content-type") || "";
@@ -150,9 +159,17 @@ app.use(express.json());
 
     try {
       const ua = req.query.ua as string || "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
-      const response = await fetch(targetUrl, {
-        headers: { "User-Agent": ua },
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8500);
+      let response;
+      try {
+        response = await fetch(targetUrl, {
+          headers: { "User-Agent": ua },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       if (!response.ok) {
         res.status(response.status).json({ error: `Target URL returned HTTP ${response.status}` });
@@ -261,7 +278,30 @@ app.use(express.json());
       return;
     }
 
-    const targetUrl = deobfuscateUrl(rawUrl);
+    let targetUrl = deobfuscateUrl(rawUrl);
+
+    // Merge extra query parameters (e.g. from GET form submissions) into the target URL
+    try {
+      const parsedUrl = new URL(targetUrl);
+      Object.keys(req.query).forEach((key) => {
+        if (key !== "url" && key !== "ua" && key !== "headerName" && key !== "headerValue") {
+          const val = req.query[key];
+          if (typeof val === "string") {
+            parsedUrl.searchParams.set(key, val);
+          } else if (Array.isArray(val)) {
+            parsedUrl.searchParams.delete(key);
+            val.forEach((v) => {
+              if (typeof v === "string") {
+                parsedUrl.searchParams.append(key, v);
+              }
+            });
+          }
+        }
+      });
+      targetUrl = parsedUrl.href;
+    } catch (e) {
+      // ignore parsing fallback
+    }
 
     if (!isUrlSafe(targetUrl)) {
       res.status(403).send("Error: Access to private or local URLs is restricted");
@@ -298,11 +338,25 @@ app.use(express.json());
         }
       }
 
-      const response = await fetch(targetUrl, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8500); // 8.5 seconds timeout
+
+      const fetchOptions: RequestInit = {
         method,
         headers: headersToForward,
-        body,
-      });
+        signal: controller.signal,
+      };
+
+      if (["POST", "PUT", "PATCH"].includes(method) && body !== undefined) {
+        fetchOptions.body = body;
+      }
+
+      let response;
+      try {
+        response = await fetch(targetUrl, fetchOptions);
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const contentType = response.headers.get("content-type") || "";
 
@@ -339,7 +393,37 @@ app.use(express.json());
 
         // Rewrite links, images, frames, scripts, and stylesheets
         rewriteAttr("a", "href");
-        rewriteAttr("form", "action");
+        
+        // Special handling for forms to support GET/POST submissions correctly
+        $("form").each((_, el) => {
+          const action = $(el).attr("action");
+          const method = ($(el).attr("method") || "get").toLowerCase();
+          
+          if (action && !action.startsWith("javascript:") && !action.startsWith("#")) {
+            try {
+              const resolvedUrl = new URL(action, targetUrl).href;
+              const obfuscated = obfuscateUrl(resolvedUrl);
+              
+              if (method === "get") {
+                // For GET forms, discard query parameters from the action attribute,
+                // and inject them as hidden inputs instead so browsers do not discard them.
+                $(el).attr("action", "/api/proxy");
+                
+                $(el).find("input[name='url']").remove();
+                $(el).find("input[name='ua']").remove();
+                
+                $(el).prepend(`<input type="hidden" name="url" value="${obfuscated}">`);
+                $(el).prepend(`<input type="hidden" name="ua" value="${customUa}">`);
+              } else {
+                // POST forms preserve action parameters, so a standard query string is fine
+                $(el).attr("action", `/api/proxy?url=${encodeURIComponent(obfuscated)}&ua=${encodeURIComponent(customUa)}`);
+              }
+            } catch (e) {
+              // ignore malformed URL errors
+            }
+          }
+        });
+
         rewriteAttr("img", "src");
         rewriteAttr("iframe", "src");
         rewriteAttr("frame", "src");

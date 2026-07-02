@@ -1,6 +1,6 @@
 {
-  "name": "Web Proxy Browser",
-  "description": "A fully functional web proxy and reader client. Supports interactive browsing, HTTP header inspection, raw source viewing, user-agent spoofing, and a clutter-free article reader mode.",
+  "name": "ShieldProxy",
+  "description": "An integrated developer sandbox browser and HTML analyzer. Supports interactive testing, HTTP response header inspection, raw source code viewing, and a clean article reader mode.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

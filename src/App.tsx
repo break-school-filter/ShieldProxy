@@ -41,7 +41,7 @@ import {
   CustomHeader 
 } from "./types";
 
-// Character shift by +3 followed by standard Base64 encoding to obfuscate queries for target firewall bypass
+// Character shift by +3 followed by standard Base64 encoding to encode queries for secure frame transport
 function obfuscateUrl(url: string): string {
   try {
     if (!url) return "";
@@ -421,17 +421,17 @@ export default function App() {
       {/* Top Header Navigation Bar */}
       <header className="h-16 border-b border-slate-800 bg-[#0f172a]/85 backdrop-blur-md sticky top-0 z-40 px-6 flex items-center justify-between gap-4">
         
-        {/* Title branding with Shield logo */}
+        {/* Title branding with Developer/Code logo */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="w-8.5 h-8.5 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
-            <Shield className="w-4.5 h-4.5 text-white animate-pulse" />
+            <Code className="w-4.5 h-4.5 text-white" />
           </div>
           <div>
             <h1 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
               ShieldProxy
               <span className="text-[9px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded font-mono border border-indigo-500/30">v2.0</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-medium hidden sm:block">Ultra-Low Latency Gateway Node</p>
+            <p className="text-[10px] text-slate-400 font-medium hidden sm:block">Integrated Developer Sandbox &amp; HTML Analyzer</p>
           </div>
         </div>
 
@@ -531,7 +531,7 @@ export default function App() {
           
           <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
             <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Encrypted Session</span>
+            <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-wider">Isolated Sandbox</span>
           </div>
         </div>
       </header>
@@ -748,32 +748,24 @@ export default function App() {
             )}
           </div>
 
-          {/* Bottom Telemetry Status Grid from "Sleek Interface" instruction */}
+          {/* Bottom Sandbox Status Grid */}
           <div className="p-4 border-t border-slate-800 bg-slate-950/60 space-y-3">
             <div className="space-y-0.5">
-              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Gateway Server</span>
-              <p className="text-slate-200 text-xs font-medium">Tokyo (NRT-04)</p>
-              <p className="text-[10px] text-slate-500">Load: <span className="text-indigo-400 font-mono">14.2%</span></p>
+              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Sandbox Environment</span>
+              <p className="text-slate-200 text-xs font-medium">Isolated Node</p>
+              <p className="text-[10px] text-emerald-400 font-medium">● System Online</p>
             </div>
             <div className="border-t border-slate-800/50 my-1"></div>
             <div className="space-y-0.5">
-              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Identity Masking</span>
-              <p className="text-slate-200 text-[10px] font-mono truncate">127.0.0.1 → <span className="text-emerald-400 font-bold">45.88.2.14</span></p>
-              <p className="text-[10px] text-slate-500">ISP: Cloudflare Global</p>
-            </div>
-            <div className="border-t border-slate-800/50 my-1"></div>
-            <div className="space-y-1">
-              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Latency Matrix</span>
-              <p className="text-slate-200 text-xs font-medium">24ms (Ultra-Low)</p>
-              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full w-4/5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
-              </div>
+              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Frame Mode</span>
+              <p className="text-slate-300 text-xs font-medium">Security Sandboxed</p>
+              <p className="text-[10px] text-slate-500">Origin Isolation: Active</p>
             </div>
             <div className="border-t border-slate-800/50 my-1"></div>
             <div className="space-y-0.5">
-              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Encryption Level</span>
-              <p className="text-slate-300 text-xs font-medium">AES-256 GCM</p>
-              <p className="text-[10px] text-slate-500">Key: SHA-512 Signed</p>
+              <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold block">Rendering Engine</span>
+              <p className="text-slate-300 text-xs font-medium">Headless Chromium</p>
+              <p className="text-[10px] text-slate-500">Device emulation: Enabled</p>
             </div>
           </div>
         </aside>
@@ -859,13 +851,13 @@ export default function App() {
                         className="flex flex-col items-center"
                       >
                         <div className="w-20 h-20 bg-indigo-600/10 border-2 border-indigo-500/30 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(99,102,241,0.25)] mb-4">
-                          <Shield className="w-10 h-10 text-indigo-400 animate-pulse" />
+                          <Code className="w-10 h-10 text-indigo-400" />
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-2">
                           ShieldProxy <span className="text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded font-mono">v2.0</span>
                         </h2>
                         <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-md">
-                          A high-speed, secure proxy portal designed to bypass censorship filters, anonymize connection data, and preview any page cleanly.
+                          An integrated developer sandbox browser and HTML analyzer designed to inspect web headers, read articles cleanly, and analyze page source code.
                         </p>
                       </motion.div>
 
@@ -883,7 +875,7 @@ export default function App() {
                           </div>
                           <input
                             type="text"
-                            placeholder="Type a web address or search query to load..."
+                            placeholder="Type a web address or search query to analyze..."
                             value={inputUrl}
                             onChange={(e) => setInputUrl(e.target.value)}
                             onKeyDown={(e) => {
@@ -896,11 +888,11 @@ export default function App() {
                             className="absolute right-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition shadow-lg shadow-indigo-500/20 flex items-center gap-1.5"
                           >
                             <Search className="w-3.5 h-3.5" />
-                            <span>Navigate</span>
+                            <span>Inspect</span>
                           </button>
                         </div>
                         <p className="text-[10px] text-slate-500 text-left mt-2 pl-4 font-mono">
-                          ⚡ Enter a query to search <span className="text-indigo-400">DuckDuckGo (Strict Privacy)</span> or write any URL (e.g. <span className="text-indigo-400">github.com</span>)
+                          ⚡ Enter a query to search <span className="text-indigo-400">DuckDuckGo Sandbox</span> or write any URL (e.g. <span className="text-indigo-400">wikipedia.org</span>)
                         </p>
                       </motion.div>
 
@@ -913,14 +905,14 @@ export default function App() {
                       >
                         <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-4">
                           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <Compass className="w-3.5 h-3.5 text-indigo-400" /> Secure Quick-Launch Presets
+                            <Compass className="w-3.5 h-3.5 text-indigo-400" /> Sandboxed Developer Presets
                           </span>
-                          <span className="text-[10px] text-slate-500 font-medium">Bypasses strict network inspection</span>
+                          <span className="text-[10px] text-slate-500 font-medium">Rendered via cloud sandboxed environments</span>
                         </div>
                         
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                           {[
-                            { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: "🦆", desc: "Private Search" },
+                            { name: "DuckDuckGo", url: "https://duckduckgo.com", icon: "🦆", desc: "Search Engine" },
                             { name: "Wikipedia", url: "https://en.wikipedia.org/wiki/Main_Page", icon: "🌐", desc: "Encyclopedia" },
                             { name: "Hacker News", url: "https://news.ycombinator.com", icon: "🔥", desc: "Tech News" },
                             { name: "GitHub", url: "https://github.com", icon: "🐙", desc: "Code Repository" },
@@ -928,59 +920,59 @@ export default function App() {
                             { name: "BBC News", url: "https://www.bbc.com", icon: "📰", desc: "World News" }
                           ].map((preset) => (
                             <button
-                              key={preset.name}
-                              onClick={() => {
-                                setInputUrl(preset.url);
-                                handleNavigate(preset.url);
-                              }}
-                              className="group flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 rounded-xl transition duration-200 shadow-sm text-center relative overflow-hidden"
-                            >
-                              <div className="absolute top-0 left-0 w-full h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
-                              <span className="text-xl mb-1.5 group-hover:scale-110 transition duration-200">{preset.icon}</span>
-                              <span className="text-xs font-bold text-slate-200 group-hover:text-indigo-400 transition leading-tight">{preset.name}</span>
-                              <span className="text-[9px] text-slate-500 mt-0.5 leading-none">{preset.desc}</span>
-                            </button>
-                          ))}
-                        </div>
-                      </motion.div>
-
-                      {/* Privacy Safeguards Info Cards */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
-                      >
-                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
-                          <div className="flex items-center gap-2 text-indigo-400">
-                            <Fingerprint className="w-4.5 h-4.5" />
-                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">URL Obfuscation</h4>
+                                key={preset.name}
+                                onClick={() => {
+                                  setInputUrl(preset.url);
+                                  handleNavigate(preset.url);
+                                }}
+                                className="group flex flex-col items-center justify-center p-3.5 bg-slate-900/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-950/20 rounded-xl transition duration-200 shadow-sm text-center relative overflow-hidden"
+                              >
+                                <div className="absolute top-0 left-0 w-full h-0.5 bg-indigo-500 scale-x-0 group-hover:scale-x-100 transition duration-300"></div>
+                                <span className="text-xl mb-1.5 group-hover:scale-110 transition duration-200">{preset.icon}</span>
+                                <span className="text-xs font-bold text-slate-200 group-hover:text-indigo-400 transition leading-tight">{preset.name}</span>
+                                <span className="text-[9px] text-slate-500 mt-0.5 leading-none">{preset.desc}</span>
+                              </button>
+                            ))}
                           </div>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Target URL paths and query parameters are dynamically encrypted before traversing local firewall inspection nodes.
-                          </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
-                          <div className="flex items-center gap-2 text-indigo-400">
-                            <Cpu className="w-4.5 h-4.5" />
-                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Header Spoofing</h4>
+                        {/* Sandbox Safeguards Info Cards */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: 0.3 }}
+                          className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full"
+                        >
+                          <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                            <div className="flex items-center gap-2 text-indigo-400">
+                              <Fingerprint className="w-4.5 h-4.5" />
+                              <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Sandboxed IFrame</h4>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                              Render live pages inside a secure, origin-restricted isolated frame to safely inspect and test responsive layouts.
+                            </p>
                           </div>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Inject custom headers or randomize your client User-Agent strings seamlessly to bypass device or regional restrictions.
-                          </p>
-                        </div>
 
-                        <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
-                          <div className="flex items-center gap-2 text-indigo-400">
-                            <Activity className="w-4.5 h-4.5" />
-                            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">CORS Resolution</h4>
+                          <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                            <div className="flex items-center gap-2 text-indigo-400">
+                              <Cpu className="w-4.5 h-4.5" />
+                              <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">User-Agent Emulation</h4>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                              Inject custom HTTP headers or emulate standard user-agents (Mobile, Desktop, Bots) to verify server response routing.
+                            </p>
                           </div>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Bypasses strict browser Cross-Origin Resource Sharing (CORS) limits using our high-speed Cloud Run server engine.
-                          </p>
-                        </div>
-                      </motion.div>
+
+                          <div className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-left space-y-1">
+                            <div className="flex items-center gap-2 text-indigo-400">
+                              <Activity className="w-4.5 h-4.5" />
+                              <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">CORS Bypass &amp; Source</h4>
+                            </div>
+                            <p className="text-[11px] text-slate-400 leading-relaxed">
+                              Retrieve response headers, extract clean semantic article texts, and inspect raw HTML source code seamlessly.
+                            </p>
+                          </div>
+                        </motion.div>
 
                     </div>
                   </div>
