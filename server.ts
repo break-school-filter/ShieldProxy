@@ -328,10 +328,17 @@ app.use(express.urlencoded({ extended: true }));
         headersToForward[req.query.headerName as string] = req.query.headerValue as string;
       }
 
-      // Prep request body if POST/PUT
+      // Prep request body if POST/PUT/PATCH
       let body: any = undefined;
       if (["POST", "PUT", "PATCH"].includes(method)) {
-        if (typeof req.body === "object") {
+        const contentTypeHeader = (req.headers["content-type"] || "").toLowerCase();
+        if (contentTypeHeader.includes("application/x-www-form-urlencoded")) {
+          if (typeof req.body === "object" && req.body !== null) {
+            body = new URLSearchParams(req.body as any).toString();
+          } else {
+            body = req.body;
+          }
+        } else if (typeof req.body === "object" && req.body !== null) {
           body = JSON.stringify(req.body);
         } else {
           body = req.body;
@@ -412,8 +419,10 @@ app.use(express.urlencoded({ extended: true }));
                 $(el).find("input[name='url']").remove();
                 $(el).find("input[name='ua']").remove();
                 
-                $(el).prepend(`<input type="hidden" name="url" value="${obfuscated}">`);
-                $(el).prepend(`<input type="hidden" name="ua" value="${customUa}">`);
+                const urlInput = $("<input>").attr("type", "hidden").attr("name", "url").attr("value", obfuscated);
+                const uaInput = $("<input>").attr("type", "hidden").attr("name", "ua").attr("value", customUa);
+                $(el).prepend(uaInput);
+                $(el).prepend(urlInput);
               } else {
                 // POST forms preserve action parameters, so a standard query string is fine
                 $(el).attr("action", `/api/proxy?url=${encodeURIComponent(obfuscated)}&ua=${encodeURIComponent(customUa)}`);
@@ -433,6 +442,9 @@ app.use(express.urlencoded({ extended: true }));
         rewriteAttr("source", "src");
         rewriteAttr("link[rel='stylesheet']", "href");
         rewriteAttr("script[src]", "src");
+
+        const escapedUrlHtml = targetUrl.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        const escapedUrlJs = targetUrl.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 
         // Inject custom banner inside the page
         const bannerHtml = `
@@ -460,10 +472,10 @@ app.use(express.urlencoded({ extended: true }));
                 <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%;"></span>
                 Proxied Site
               </span>
-              <span style="color: #94a3b8; overflow: hidden; text-overflow: ellipsis;">${targetUrl}</span>
+              <span style="color: #94a3b8; overflow: hidden; text-overflow: ellipsis;">${escapedUrlHtml}</span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-              <button onclick="window.parent.postMessage({ action: 'proxy-navigate', url: '${targetUrl}' }, '*')" style="
+              <button onclick="window.parent.postMessage({ action: 'proxy-navigate', url: '${escapedUrlJs}' }, '*')" style="
                 background: #1e293b; 
                 color: #e2e8f0; 
                 border: 1px solid #475569; 
@@ -535,7 +547,15 @@ app.use(express.urlencoded({ extended: true }));
   });
 
 // Vite middleware integration for React frontend
-if (!process.env.VERCEL) {
+const isServerless = 
+  process.env.VERCEL !== undefined || 
+  process.env.NOW_BUILDER !== undefined || 
+  process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined ||
+  process.env.LAMBDA_TASK_ROOT !== undefined ||
+  process.env.NETLIFY !== undefined ||
+  process.env.FUNCTIONS_SIGNATURE_TYPE !== undefined;
+
+if (!isServerless) {
   const startLocalServer = async () => {
     if (process.env.NODE_ENV !== "production") {
       const { createServer: createViteServer } = await import("vite");
