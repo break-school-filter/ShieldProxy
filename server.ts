@@ -547,15 +547,11 @@ app.use(express.urlencoded({ extended: true }));
   });
 
 // Vite middleware integration for React frontend
-const isServerless = 
+const isVercel = 
   process.env.VERCEL !== undefined || 
-  process.env.NOW_BUILDER !== undefined || 
-  process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined ||
-  process.env.LAMBDA_TASK_ROOT !== undefined ||
-  process.env.NETLIFY !== undefined ||
-  process.env.FUNCTIONS_SIGNATURE_TYPE !== undefined;
+  process.env.NOW_BUILDER !== undefined;
 
-if (!isServerless) {
+if (!isVercel) {
   const startLocalServer = async () => {
     if (process.env.NODE_ENV !== "production") {
       const { createServer: createViteServer } = await import("vite");
